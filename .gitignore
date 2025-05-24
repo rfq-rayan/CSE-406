@@ -1,0 +1,183 @@
+# Operating System Files
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+*.cab
+*.msi
+*.msm
+*.msp
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# IDE and Editor Files
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+.history/
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+.idea_modules/
+out/
+
+# Eclipse
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+.project
+.classpath
+
+# Build Outputs and Dependencies
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+target/
+.mvn/
+
+# C/C++
+*.o
+*.ko
+*.obj
+*.elf
+*.ilk
+*.map
+*.exp
+*.gch
+*.pch
+*.lib
+*.a
+*.la
+*.lo
+*.dll
+*.so
+*.so.*
+*.dylib
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Document & Office temporary files
+~$*
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+*.xlk
+~*.docx
+~*.xlsx
+~*.pptx
+.~lock.*
+
+# Obsidian specific (since this is in an Obsidian vault)
+.obsidian/workspace
+.obsidian/cache
+.trash/
+
+# Custom for academic projects
+*.log
+results/
+output/
+data/
+!data/README.md
+paper/submission/
+.Rhistory
+.RData
+
+# Media and Archives
+
+# Video files
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.mkv
+*.webm
+
+# Archive files
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+*.bz2
+*.xz
+*.iso
+
