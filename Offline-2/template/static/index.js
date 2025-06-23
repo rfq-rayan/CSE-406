@@ -62,6 +62,89 @@ function app() {
         * 4. Fetch the heatmap from the backend and add it to the local collection.
         * 5. Handle errors and update the status.
         */
+
+      this.isCollecting = true;
+      this.status = "Collecting trace data...";
+      this.traceData = [];
+      this.statusIsError = false; 
+      this.showingTraces = false;
+      
+      try {
+        // Create a worker
+        console.log('Creating worker...');
+        let worker = new Worker("worker.js");
+
+        // Start the trace collection
+        this.status = "Running cache sweep...";
+        console.log('Starting cache sweep...');
+        const trace = await new Promise((resolve, reject) => {
+          worker.onmessage = (e) => {
+            console.log('Received data from worker:', e.data);
+            if (e.data.error) {
+              reject(new Error(e.data.error));
+            } else if (e.data.data) {
+              // Handle new format with data wrapper
+              if (e.data.truncated) {
+                console.warn(`Data was truncated from ${e.data.originalSize} to ${e.data.truncatedSize} intervals`);
+                this.status = `Cache sweep complete (truncated: ${e.data.truncatedSize}/${e.data.originalSize} intervals)`;
+              }
+              resolve(e.data.data);
+            } else {
+              // Handle old format (backward compatibility)
+              resolve(e.data);
+            }
+          };
+          worker.onerror = (error) => {
+            console.error('Worker error:', error);
+            reject(error);
+          };
+          worker.postMessage("start");
+        });
+        
+        console.log('Trace data received:', trace);
+        
+        // Update trace data locally
+        this.traceData = trace;
+        
+        // Send trace data to backend for heatmap generation
+        this.status = "Generating heatmap...";
+        console.log('Sending trace data to backend...');
+        const response = await fetch('/collect_trace', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ traceData: trace })
+        });
+        
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log('Backend response:', result);
+        
+        if (result.success) {
+          // Add heatmap to local collection
+          this.heatmaps.push(result.heatmap);
+          this.status = `Trace data collection complete!`;
+          this.showingTraces = true;
+        } else {
+          throw new Error(result.error || 'Failed to generate heatmap');
+        }
+        
+        // Terminate worker
+        worker.terminate();
+        
+      } catch (error) {
+        console.error("Error collecting trace data:", error);
+        this.status = `Error: ${error.message}`;
+        this.statusIsError = true;
+      } finally {
+        this.isCollecting = false;
+      }
     },
 
     // Download the trace data as JSON (array of arrays format for ML)
@@ -72,6 +155,54 @@ function app() {
         * 2. Create a download file with the trace data in JSON format.
         * 3. Handle errors and update the status.
         */
+        
+      try {
+        this.status = "Fetching latest traces...";
+        
+        // Fetch latest data from backend
+        const response = await fetch('/api/get_results');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.success && result.traces.length > 0) {
+          // Create download data
+          const downloadData = {
+            traces: result.traces,
+            metadata: {
+              timestamp: new Date().toISOString(),
+              trace_count: result.traces.length,
+              heatmap_count: result.heatmaps.length
+            }
+          };
+          
+          // Create blob and download
+          const blob = new Blob([JSON.stringify(downloadData, null, 2)], {
+            type: 'application/json'
+          });
+          
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `cache_traces_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          
+          this.status = `Downloaded ${result.traces.length} traces successfully!`;
+        } else {
+          this.status = "No traces available to download";
+        }
+        
+      } catch (error) {
+        console.error("Error downloading traces:", error);
+        this.status = `Error downloading traces: ${error.message}`;
+        this.statusIsError = true;
+      }
     },
 
     // Clear all results from the server
@@ -82,6 +213,60 @@ function app() {
        * 2. Clear local copies of trace data and heatmaps.
        * 3. Handle errors and update the status.
        */
+       
+      try {
+        this.status = "Clearing all results...";
+        
+        // Send clear request to backend
+        const response = await fetch('/api/clear_results', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          // Clear local data
+          this.traceData = [];
+          this.heatmaps = [];
+          this.latencyResults = null;
+          this.showingTraces = false;
+          this.status = "Cleared";
+        } else {
+          throw new Error(result.error || 'Failed to clear results');
+        }
+        
+      } catch (error) {
+        console.error("Error clearing results:", error);
+        this.status = `Error clearing results: ${error.message}`;
+        this.statusIsError = true;
+      }
+    },
+
+    // Fetch existing results when page loads
+    async fetchResults() {
+      try {
+        const response = await fetch('/api/get_results');
+        
+        if (response.ok) {
+          const result = await response.json();
+          
+          if (result.success) {
+            this.heatmaps = result.heatmaps || [];
+            if (this.heatmaps.length > 0) {
+              this.showingTraces = true;
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching existing results:", error);
+      }
     },
   };
 }

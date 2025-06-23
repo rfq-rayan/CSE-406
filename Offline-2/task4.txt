@@ -1,0 +1,43 @@
+In this task, you’ll train a neural network model that can identify which website a user
+is visiting based solely on side-channel measurements.
+Where to Edit
+train.py
+In this task, you will implement the machine learning component that turns our raw
+traces into a powerful classifier. The starter code includes a partially implemented PyTorch
+training script with neural network model definitions.
+This is where the true power of our side-channel attack becomes apparent - with enough
+data and the right model, we can accurately determine which website someone is visiting
+without ever seeing their screen or network traffic.
+PyTorch Overview
+PyTorch is a popular machine learning library that provides a flexible and intuitive
+approach to building neural networks. It includes tools for defining models, loading
+data, training, and evaluating performance. The starter code includes several model
+architectures, but you’re free to modify them or create your own.
+For this task you will have to:
+1. Complete the data loading and preprocessing functions in train.py:
+• Load the trace data from your SQLite database or the exported JSON file
+• Convert the raw traces into a format suitable for training
+• Split the data into training and testing sets
+• Normalize the data (e.g., standard scaling or min-max scaling)
+2. Call the train() function to train your model(s) with suitable parameters.
+3. After training, load the best model and evaluate its performance on the test set by
+calling evaluate() with suitable parameters.
+4. Analyze and document your findings:
+• Identify which websites are easiest/hardest to classify
+• Experiment with different model architectures or hyperparameters
+• Analyze how the amount of training data affects performance
+• Document your observations in your report
+Implementation Requirements
+✓ Achieve at least 60% classification accuracy with at least 3 different websites
+✓ Implement proper data loading, preprocessing, and model training
+✓ Provide comprehensive evaluation metrics and visualizations
+✓ Document your approach and findings in your report
+✓ Save your trained model so it can be used in the bonus task
+Tips
+• Start with simple models before trying complex architectures
+• Experiment with different learning rates and batch sizes
+• Try different data preprocessing approaches
+• Ensure your dataset is balanced (about the same number of traces per website)
+• Remember that more data usually leads to better performance
+• If you struggle to get good results, you can try disabling sandboxing in your
+browser (e.g., --no-sandbox for Chrome)

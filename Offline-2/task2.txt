@@ -1,0 +1,79 @@
+Task 2: Trace Collection with the Sweep Counting
+Attack (35%)
+Now we’re getting to the exciting part! It’s time to implement a real side-channel attack
+technique called the Sweep Counting Attack.
+The Attack Concept
+The idea is brilliantly simple:
+1. Allocate a buffer large enough to fill a significant portion of the Last Level Cache
+(LLC)
+2. Start counting how many times you can sequentially access each cache line in
+this buffer within fixed time windows of P milliseconds
+3. Collect these counts for about 10 seconds, creating an array of measurements
+4. This pattern of measurements will look different depending on what website is
+running in another tab!
+
+Where to Edit
+static/worker.js, static/index.html, static/index.js, app.py
+
+
+What is the Last Level Cache (LLC)?
+The Last Level Cache (LLC) is the largest and slowest cache in the CPU’s memory
+hierarchy, typically L3 cache on modern processors. It’s shared among all cores, which
+is what makes our attack possible - code running in different browser tabs can affect
+each other through this shared resource. The size of the LLC varies by processor but
+is typically in the range of 8-32MB
+
+
+
+For this task you will have to:
+1. Find LLCSIZE (the size of the Last Level Cache) on your machine. Use getconf -a |
+grep CACHE on Linux or check your CPU specifications.
+2. Complete the sweep(P) function in worker.js to:
+• Allocate a buffer of size LLCSIZE (the size of the Last Level Cache)
+• Read through this buffer at intervals of LINESIZE to access different cache lines
+• Count how many sweeps can be performed in P milliseconds
+• Repeat this measurement K = TIME / P times (for a total of 10 seconds)
+• Return the array of sweep counts
+3. Pick a suitable value for P based on your experiments in Task 1,
+• It must be small enough to get a lot of measurements but large enough to be
+reliably measured by performance.now()
+4. Add the ”Collect Trace” button in index.html that calls collectTraceData()
+5. Implement collectTraceData() in index.js to:
+• Start the worker thread that runs your sweep() function
+• Handle the data returned from the worker
+• Send the collected data to the backend for visualization
+6. Implement the Flask endpoint /collect trace in app.py to:
+
+• Receive trace data from the frontend as JSON
+• Generate a heatmap visualization using matplotlib
+• Store both the raw data and the visualization
+• Return the image to display in the frontend
+7. Implement showing the heatmap in the UI in index.html and index.js
+• Display the heatmap images in the UI
+8. Implement the Flask endpoint /clear results in app.py to:
+• Clear the stored traces and visualizations
+9. Implement ”Download Traces” and ”Clear Results” buttons in the UI
+
+
+• Receive trace data from the frontend as JSON
+• Generate a heatmap visualization using matplotlib
+• Store both the raw data and the visualization
+• Return the image to display in the frontend
+7. Implement showing the heatmap in the UI in index.html and index.js
+• Display the heatmap images in the UI
+8. Implement the Flask endpoint /clear results in app.py to:
+• Clear the stored traces and visualizations
+9. Implement ”Download Traces” and ”Clear Results” buttons in the UI
+
+
+Implementation Requirements
+✓ Implement a sweep() function that produces meaningful measurements
+✓ Create a user interface that allows collecting and visualizing traces
+✓ Implement proper data handling both in frontend and backend
+
+When you run your implementation, you
+should see different visual patterns based on
+whether:
+• The browser is idle
+• You are visiting YouTube
+• You are checking your email

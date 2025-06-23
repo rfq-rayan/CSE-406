@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Website Detection - Side-Channel Attack Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .warning {
+            background: rgba(255, 152, 0, 0.2);
+            border: 2px solid rgba(255, 152, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .panel h2 {
+            margin-top: 0;
+            color: #fff;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .detection-controls {
+            text-align: center;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:disabled {
+            background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn.demo {
+            background: linear-gradient(45deg, #74b9ff, #0984e3);
+        }
+
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.1em;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status.idle {
+            background: rgba(149, 165, 166, 0.3);
+            border: 2px solid rgba(149, 165, 166, 0.8);
+        }
+
+        .status.collecting {
+            background: rgba(52, 152, 219, 0.3);
+            border: 2px solid rgba(52, 152, 219, 0.8);
+            animation: pulse 2s infinite;
+        }
+
+        .status.predicting {
+            background: rgba(230, 126, 34, 0.3);
+            border: 2px solid rgba(230, 126, 34, 0.8);
+            animation: pulse 1s infinite;
+        }
+
+        .status.complete {
+            background: rgba(39, 174, 96, 0.3);
+            border: 2px solid rgba(39, 174, 96, 0.8);
+        }
+
+        .status.error {
+            background: rgba(231, 76, 60, 0.3);
+            border: 2px solid rgba(231, 76, 60, 0.8);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
+        .prediction-result {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .website-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+
+        .confidence {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e74c3c, #f39c12, #f1c40f, #2ecc71);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .how-it-works {
+            margin-top: 20px;
+        }
+
+        .how-it-works ol {
+            text-align: left;
+            line-height: 1.6;
+        }
+
+        .how-it-works li {
+            margin-bottom: 10px;
+        }
+
+        .demo-section {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .demo-result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            text-align: left;
+        }
+
+        .correct {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        .incorrect {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 Real-Time Website Detection</h1>
+        <p>Side-Channel Attack Demonstration using Machine Learning</p>
+        
+
+
+    <div class="main-container">
+        <div class="panel">
+            <h2>🎯 Live Detection</h2>
+            
+            <div class="detection-controls">
+                <button id="startBtn" class="btn" onclick="startDetection()">
+                    Start Side-Channel Analysis
+                </button>
+                
+                <div id="status" class="status idle">
+                    Ready to analyze browsing patterns...
+                </div>
+                
+                <div id="predictionResult" class="prediction-result" style="display: none;">
+                    <div class="website-name" id="websiteName">Unknown</div>
+                    <div class="confidence">
+                        Confidence: <span id="confidenceText">0%</span>
+                    </div>
+                    <div class="confidence-bar">
+                        <div id="confidenceFill" class="confidence-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <button id="demoBtn" class="btn demo" onclick="runDemo()">
+                    🎲 Run Demo with Sample Data
+                </button>
+                
+                <div id="demoResult" class="demo-result" style="display: none;">
+                    <strong>Demo Results:</strong><br>
+                    <div id="demoDetails"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>🔬 How It Works</h2>
+            
+            <div class="how-it-works">
+                <ol>
+                    <li><strong>Timing Collection:</strong> Collects side-channel timing data from your browser's performance API</li>
+                    <li><strong>Pattern Analysis:</strong> Uses a trained Convolutional Neural Network to analyze timing patterns</li>
+                    <li><strong>Website Fingerprinting:</strong> Identifies unique timing signatures that correlate with specific websites</li>
+                    <li><strong>Real-time Prediction:</strong> Classifies which website you're likely visiting based on learned patterns</li>
+                </ol>
+                
+                <h3>🧠 Model Details</h3>
+                <ul>
+                    <li><strong>Architecture:</strong> Complex 1D CNN with batch normalization</li>
+                    <li><strong>Training Data:</strong> 30 traces from 3 websites</li>
+                    <li><strong>Accuracy:</strong> 66.7% on test set</li>
+                    <li><strong>Input:</strong> 1000 timing measurements</li>
+                </ul>
+                
+                <h3>⚡ Performance</h3>
+                <ul>
+                    <li><strong>Collection Time:</strong> ~10 seconds</li>
+                    <li><strong>Prediction Time:</strong> <1 second</li>
+                    <li><strong>Model Size:</strong> 4.16M parameters</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isDetecting = false;
+        let statusCheckInterval;
+
+        function startDetection() {
+            if (isDetecting) return;
+            
+            isDetecting = true;
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('startBtn').textContent = 'Analyzing...';
+            
+            updateStatus('collecting', 'Collecting timing data from browser...');
+            
+            fetch('/start_detection', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    updateStatus('error', 'Error: ' + data.error);
+                    resetUI();
+                } else {
+                    // Start checking for results
+                    statusCheckInterval = setInterval(checkPrediction, 1000);
+                }
+            })
+            .catch(error => {
+                updateStatus('error', 'Connection error: ' + error.message);
+                resetUI();
+            });
+        }        function checkPrediction() {
+            fetch('/get_prediction')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'collecting') {
+                    updateStatus('collecting', 'Collecting side-channel timing data...');
+                } else if (data.status === 'predicting') {
+                    updateStatus('predicting', 'Analyzing patterns with neural network...');
+                } else if (data.status === 'fallback_demo') {
+                    updateStatus('predicting', 'Using synthetic data due to browser compatibility...');
+                } else if (data.status === 'complete') {
+                    clearInterval(statusCheckInterval);
+                    let message = 'Analysis complete!';
+                    if (data.note) {
+                        message += ' (Used fallback mode)';
+                    }
+                    updateStatus('complete', message);
+                    showPrediction(data.website, data.confidence);
+                    resetUI();
+                } else if (data.status === 'error') {
+                    clearInterval(statusCheckInterval);
+                    updateStatus('error', 'Error: ' + (data.error || 'Unknown error'));
+                    resetUI();
+                }
+            })
+            .catch(error => {
+                clearInterval(statusCheckInterval);
+                updateStatus('error', 'Connection error: ' + error.message);
+                resetUI();
+            });
+        }
+
+        function updateStatus(type, message) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = 'status ' + type;
+            statusDiv.textContent = message;
+        }
+
+        function showPrediction(website, confidence) {
+            const resultDiv = document.getElementById('predictionResult');
+            const websiteName = document.getElementById('websiteName');
+            const confidenceText = document.getElementById('confidenceText');
+            const confidenceFill = document.getElementById('confidenceFill');
+            
+            websiteName.textContent = website;
+            confidenceText.textContent = Math.round(confidence * 100) + '%';
+            confidenceFill.style.width = (confidence * 100) + '%';
+            
+            resultDiv.style.display = 'block';
+        }
+
+        function resetUI() {
+            isDetecting = false;
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('startBtn').textContent = 'Start Side-Channel Analysis';
+        }
+
+        function runDemo() {
+            document.getElementById('demoBtn').disabled = true;
+            document.getElementById('demoBtn').textContent = 'Running Demo...';
+            
+            fetch('/demo_predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const demoResult = document.getElementById('demoResult');
+                const demoDetails = document.getElementById('demoDetails');
+                
+                const correctClass = data.correct ? 'correct' : 'incorrect';
+                const correctIcon = data.correct ? '✅' : '❌';
+                
+                demoDetails.innerHTML = `
+                    <strong>Predicted Website:</strong> ${data.predicted_website}<br>
+                    <strong>Confidence:</strong> ${Math.round(data.confidence * 100)}%<br>
+                    <strong>Actual Website:</strong> ${data.true_website}<br>
+                    <strong>Result:</strong> <span class="${correctClass}">${correctIcon} ${data.correct ? 'Correct' : 'Incorrect'}</span>
+                `;
+                
+                demoResult.style.display = 'block';
+                
+                document.getElementById('demoBtn').disabled = false;
+                document.getElementById('demoBtn').textContent = '🎲 Run Demo with Sample Data';
+            })
+            .catch(error => {
+                alert('Demo error: ' + error.message);
+                document.getElementById('demoBtn').disabled = false;
+                document.getElementById('demoBtn').textContent = '🎲 Run Demo with Sample Data';
+            });
+        }
+
+        // Initialize page
+        window.onload = function() {
+            updateStatus('idle', 'Ready to analyze browsing patterns...');
+        };
+    </script>
+</body>
+</html>

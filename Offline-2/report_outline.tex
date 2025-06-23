@@ -1,0 +1,224 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+% Page setup
+\geometry{margin=1in}
+
+\title{\textbf{Website Fingerprinting using Side-Channel Attacks:\\
+Implementation and Analysis - Report Outline}}
+
+\author{
+    Rafiqul Islam Rayan \\
+    Student ID: 2005062 \\
+    Department of Computer Science and Engineering \\
+    Bangladesh University of Engineering and Technology
+}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section*{Project Overview}
+
+This report documents a comprehensive implementation of website fingerprinting attacks using browser-based side-channel analysis. The project demonstrates how JavaScript timing measurements can identify websites through cache behavior analysis and machine learning classification.
+
+\section{Report Structure Outline}
+
+\subsection{1. Introduction}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Topic}: Website fingerprinting using side-channel attacks
+    \item \textbf{Motivation}: Understanding browser security vulnerabilities
+    \item \textbf{Objectives}: 5-phase implementation from measurement to real-time detection
+    \item \textbf{Tech Stack}: JavaScript, Python, PyTorch, Flask, Selenium
+\end{itemize}
+
+\subsection{2. Methodology}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Five-Phase Approach}:
+    \begin{enumerate}
+        \item Latency Measurement - Cache access characterization
+        \item Cache Sweep Implementation - Timing trace collection  
+        \item Dataset Generation - Labeled training data creation
+        \item Model Training - CNN classification algorithms
+        \item Real-time Detection - Live attack system deployment
+    \end{enumerate}
+\end{itemize}
+
+\subsection{3. Phase 1: Latency Measurement}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Implementation}: JavaScript Web Workers for cache timing
+    \item \textbf{Key Results}:
+    \begin{itemize}
+        \item L1/L2 Cache: 0.00ms (< 100,000 cache lines)
+        \item L3 Cache: 0.5-1.00ms (1,000,000 cache lines)
+        \item Main Memory: 5.00ms (10,000,000 cache lines)
+    \end{itemize}
+    \item \textbf{Validation}: Clear memory hierarchy effects demonstrated
+\end{itemize}
+
+\subsection{4. Phase 2: Cache Sweep Implementation}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Parameters}: 24MB cache size, 10s collection, 10ms intervals
+    \item \textbf{Challenges}: Browser security restrictions, memory constraints
+    \item \textbf{Solutions}: Web Workers, progressive data collection, error handling
+\end{itemize}
+
+\subsection{5. Phase 3: Dataset Generation}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Target Websites}: 3 sites (BUET Moodle, Google, Prothom Alo)
+    \item \textbf{Dataset Statistics}:
+    \begin{itemize}
+        \item Total: 30 traces (10 per website)
+        \item Trace length: 1000 data points each
+        \item Mean values: 41.54 (Moodle), 41.44 (Google), 39.79 (Prothom Alo)
+    \end{itemize}
+    \item \textbf{Quality Issues}: Limited diversity, temporal correlation
+\end{itemize}
+
+\subsection{6. Phase 4: Machine Learning Model Training}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Architectures}: Basic CNN vs Complex CNN
+    \item \textbf{Training Config}: 50 epochs, Adam optimizer, 80/20 split
+    \item \textbf{Key Results}:
+    \begin{itemize}
+        \item Basic CNN: 54.17\% training, 50.00\% test accuracy
+        \item Complex CNN: 100.00\% training, 66.67\% test accuracy (best)
+    \end{itemize}
+    \item \textbf{Analysis}: Complex model shows overfitting but better performance
+\end{itemize}
+
+\subsection{7. Phase 5: Real-time Detection System}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Architecture}: Flask web app with Selenium WebDriver
+    \item \textbf{Components}: Model serving, browser automation, web interface
+    \item \textbf{Challenges}: Timing consistency, browser overhead, prediction bias
+    \item \textbf{Status}: Functional with model-based predictions
+\end{itemize}
+
+\subsection{8. Detailed Analysis and Findings}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Cache Characterization}: Memory hierarchy validation successful
+    \item \textbf{Timing Patterns}: Website-specific signatures identified
+    \item \textbf{Model Analysis}: CNN effectiveness vs overfitting trade-offs
+    \item \textbf{Real-time Performance}: Integration challenges documented
+\end{itemize}
+
+\subsection{9. Challenges and Technical Difficulties}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Browser Security}: Timer resolution reduction, site isolation
+    \item \textbf{Data Collection}: Memory limits, timing consistency, platform differences
+    \item \textbf{ML Limitations}: Small dataset (30 traces), overfitting risks
+\end{itemize}
+
+\subsection{10. Advanced Techniques and Future Work}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Multi-Channel Fusion}: Branch prediction, TLB timing, prefetcher analysis
+    \item \textbf{Evasion Techniques}: Adaptive timing, noise reduction, indirect measurements
+    \item \textbf{Improvements}: Longitudinal studies, cross-browser testing, mobile platforms
+\end{itemize}
+
+\subsection{11. Results and Discussion}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Key Findings}:
+    \begin{itemize}
+        \item JavaScript-based cache timing attacks are feasible
+        \item Modern browsers impose significant constraints
+        \item CNN models can learn timing patterns effectively
+        \item Laboratory vs real-world deployment gaps exist
+    \end{itemize}
+    \item \textbf{Best Accuracy}: 66.67\% (Complex CNN on 3-website dataset)
+\end{itemize}
+
+\subsection{12. Security Implications}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Privacy Concerns}: Browsing patterns inferable from timing
+    \item \textbf{Attack Capabilities}: JavaScript bypasses some browser security
+    \item \textbf{Countermeasures}: Timing randomization, cache partitioning, resolution reduction
+\end{itemize}
+
+\subsection{13. Conclusion}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Technical Achievements}: Complete 5-phase pipeline implementation
+    \item \textbf{Research Contributions}: Practical feasibility demonstration
+    \item \textbf{Limitations}: Small dataset, browser constraints, hardware dependencies
+    \item \textbf{Impact}: Validates threat model, highlights security evolution needs
+\end{itemize}
+
+\section{Key Metrics Summary}
+
+\begin{table}[H]
+\centering
+\caption{Project Performance Summary}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Dataset Size & 30 traces (3 websites) \\
+Best Model Accuracy & 66.67\% (Complex CNN) \\
+Training Configuration & 50 epochs, Adam optimizer \\
+Real-time System & Functional Flask application \\
+Cache Hierarchy Validation & Successful (0.00ms to 5.00ms) \\
+Browser Compatibility & Chrome/Chromium tested \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Implementation Files}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Phase 1}: \texttt{template/static/warmup.js} - Cache latency measurement
+    \item \textbf{Phase 2}: \texttt{code/static/worker.js} - Cache sweep implementation
+    \item \textbf{Phase 3}: \texttt{code/dataset.json} - Generated dataset (30 traces)
+    \item \textbf{Phase 4}: \texttt{code/train.py} - CNN model training and evaluation
+    \item \textbf{Phase 5}: \texttt{realtime\_detection/app.py} - Flask real-time system
+\end{itemize}
+
+\section{Research Contributions}
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Practical Implementation}: Working browser-based side-channel attack
+    \item \textbf{Security Assessment}: Quantified effectiveness of browser defenses
+    \item \textbf{ML Applications}: Demonstrated machine learning enhancement of timing attacks
+    \item \textbf{Defense Insights}: Identified vulnerabilities and potential countermeasures
+    \item \textbf{Comprehensive Analysis}: End-to-end pipeline with real-world challenges
+\end{enumerate}
+
+\section{Future Research Directions}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Scale Up}: Expand to hundreds of websites and thousands of traces
+    \item \textbf{Cross-Platform}: Test across different browsers, OS, and hardware
+    \item \textbf{Advanced ML}: Apply ensemble methods and sophisticated architectures
+    \item \textbf{Defense Evaluation}: Systematically test countermeasure effectiveness
+    \item \textbf{Multi-Modal}: Combine timing with other side-channel sources
+\end{itemize}
+
+\section*{Contact Information}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Author}: Rafiqul Islam Rayan
+    \item \textbf{Student ID}: 2005062
+    \item \textbf{Institution}: Bangladesh University of Engineering and Technology
+    \item \textbf{Department}: Computer Science and Engineering
+    \item \textbf{Course}: CSE 406 - Computer Security
+\end{itemize}
+
+\vfill
+\hrule
+\begin{center}
+\textit{This outline summarizes a comprehensive report on website fingerprinting attacks\\
+using browser-based side-channel analysis and machine learning techniques.}
+\end{center}
+
+\end{document}

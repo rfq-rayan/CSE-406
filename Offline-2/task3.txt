@@ -1,0 +1,36 @@
+In this task, you will implement automation to collect a substantial dataset of website
+fingerprints. The starter code includes a partially implemented Selenium script (collect.py)
+and a database module (database.py) that uses SQLite to store collected traces.
+Selenium is a powerful browser automation tool that allows you to programmatically
+control web browsers. We’ll use it to automatically open different websites and collect their
+fingerprinting traces.
+As you run your experiments, you will notice they will take a long time to complete.
+Your system might shutdown or the browser might crash unexpectedly. We do not want
+to lose our data in any such event. So, we will use a SQLite database to store our traces.
+Conveniently for you, the starter code already includes a database module database.py that
+uses SQLite to store collected traces. You will integrate this module into your automation
+script to ensure that all collected traces are stored reliably.
+
+
+For this task you will have to:
+1. Complete the data collection functions in collect.py to:
+• Start the Flask server if it’s not already running
+• Open the fingerprinting page in one browser tab
+• Open one of the target websites (like prothomalo.com, buet.ac.bd, google.com) in
+another tab
+• Simulate user activity by scrolling randomly on the target website
+• Trigger trace collection on the fingerprinting page
+• Download the trace data
+• Repeat for multiple websites and multiple times per website
+2. Store the collected trace data reliably in a database by integrating database.py.
+3. Test your implementation by collecting at least 10 traces for each of 3 different websites
+
+
+
+
+Implementation Requirements
+✓ Implement robust automation that can run unattended for extended periods
+✓ Ensure proper error handling to prevent crashes during long collection runs
+✓ Store collected traces in the SQLite database with appropriate metadata
+✓ Implement a clean shutdown procedure that saves all data before exiting
+✓ Document any browser-specific configurations needed for your solution

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Fingerprinting</title>
+    <!-- Pico CSS - minimal CSS framework -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <!-- Alpine.js - minimal reactive framework -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        body {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .heatmap-gallery {
+            margin-top: 2rem;
+        }
+        
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+        
+        .heatmap-item {
+            text-align: center;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        
+        .heatmap-item h4 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+        }
+        
+        .results-table {
+            width: 100%;
+            margin-top: 1rem;
+        }
+        
+        .results-table th,
+        .results-table td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }        
+    </style>
+</head>
+<body>
+    <main class="container" x-data="app()" x-init="fetchResults()">
+        <h1>CSE406: Website Fingerprinting</h1>
+        
+        <div class="button-group">
+            <button @click="collectLatencyData()" :disabled="isCollecting">Collect Latency Data</button>
+
+            <!--Implement Collect Trace button. It should call collectTraceData(). -->
+            <button @click="collectTraceData()" :disabled="isCollecting">Collect Trace Data</button>
+            <!--Implement Download Traces button. It should call downloadTraces(). -->
+            <button @click="downloadTraces()" :disabled="isCollecting">Download Traces</button>
+            <!--Implement Clear Results button. It should call clearResults(). -->
+            <button @click="clearResults()" :disabled="isCollecting">Clear all results</button>
+        </div>
+        
+        <div x-show="status" role="alert" x-text="status" 
+             :class="{'alert-success': !statusIsError, 'alert-error': statusIsError}"></div>
+        
+        <!-- Latency Results Table -->
+        <template x-if="latencyResults && !showingTraces">
+            <div class="results-container">
+                <h3>Latency Results</h3>
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>N</th>
+                            <th>Median Access Latency (ms)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="(time, n) in latencyResults" :key="n">
+                            <tr>
+                                <td x-text="n"></td>
+                                <td x-text="time.toFixed(2)"></td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </template>
+        
+        <!-- Heatmap gallery for all traces -->
+        <!-- Implement UI for showing a list of heatmaps fetched from the server -->
+        <template x-if="showingTraces && heatmaps.length > 0">
+            <div class="heatmap-gallery">
+                <h3>Generated Heatmaps</h3>
+                <div class="heatmap-grid" style="grid-template-columns: 1fr;"></div>
+                    <template x-for="(heatmap, index) in heatmaps" :key="heatmap.timestamp">
+                        <div class="heatmap-item">
+                            
+                            <img :src="heatmap.path" :alt="`Heatmap ${index + 1}`" style="max-width: 100%; height: auto; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </template>
+    </main>
+
+    <script src="index.js"></script>
+    <script>
+        // App is now initialized with x-init directive
+    </script>
+</body>
+</html>
